@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sfx } from '../utils/audioFX';
+import { Translations } from '../i18n/translations';
 
 export type WishStyle = 'royalty' | 'billionaire' | 'cyberpunk' | 'luxury-travel' | 'superstar' | 'fairytale';
 
@@ -49,6 +50,7 @@ interface AIWishVisionModalProps {
   userPoints: number;
   onAddPoints: (points: number, reason: string) => void;
   userEmail: string;
+  t?: Translations;
 }
 
 export const AIWishVisionModal: React.FC<AIWishVisionModalProps> = ({
@@ -56,7 +58,8 @@ export const AIWishVisionModal: React.FC<AIWishVisionModalProps> = ({
   onClose,
   userPoints,
   onAddPoints,
-  userEmail
+  userEmail,
+  t
 }) => {
   const [wishInput, setWishInput] = useState('I want to be rich and travel the world on a private jet');
   const [selectedStyle, setSelectedStyle] = useState<WishStyle>('billionaire');
@@ -535,13 +538,13 @@ export const AIWishVisionModal: React.FC<AIWishVisionModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-white">AI Wish & Dream Manifestor</h3>
+                <h3 className="text-sm font-bold text-white">{t?.aiWishTitle || 'AI Future Wish & Vision Studio'}</h3>
                 <span className="text-[10px] font-mono-code font-bold uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  Wishes ➔ Videos
+                  {t?.manifestWishBtn || 'Wishes ➔ Videos'}
                 </span>
               </div>
               <p className="text-[11px] text-neutral-400">
-                Turn wishes into viral 9:16 short videos. Share to social media & earn Chrono Points!
+                {t?.aiWishSub || 'Turn your ambitions into cinematic future videos and prophecy cards ready for TikTok & Instagram'}
               </p>
             </div>
           </div>
@@ -550,7 +553,7 @@ export const AIWishVisionModal: React.FC<AIWishVisionModalProps> = ({
             {/* Live User Points Pill */}
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono-code font-bold text-xs shadow-sm">
               <Coins className="w-3.5 h-3.5 text-amber-400" />
-              <span>{userPoints} Chrono Pts</span>
+              <span>{userPoints} {t?.chronoPoints || 'Chrono Points'}</span>
             </div>
 
             <button
@@ -570,13 +573,13 @@ export const AIWishVisionModal: React.FC<AIWishVisionModalProps> = ({
             <div>
               <label className="text-[11px] font-mono-code uppercase font-bold text-neutral-400 block mb-1.5 flex items-center gap-1">
                 <Wand2 className="w-3.5 h-3.5 text-rose-400" />
-                What is your biggest wish for future you?
+                {t?.aiWishTitle || 'What is your biggest wish for future you?'}
               </label>
               <textarea
                 value={wishInput}
                 onChange={(e) => setWishInput(e.target.value)}
                 rows={2}
-                placeholder="e.g. I want to be rich... or I want to be the queen..."
+                placeholder={t?.wishInputPlaceholder || 'e.g. I want to be rich... or I want to be the queen...'}
                 className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-rose-500 resize-none font-sans"
               />
             </div>
@@ -609,7 +612,7 @@ export const AIWishVisionModal: React.FC<AIWishVisionModalProps> = ({
             {/* Aesthetic Theme Chooser */}
             <div>
               <label className="text-[11px] font-mono-code uppercase font-bold text-neutral-400 block mb-1.5">
-                Visual Style & Timeline
+                {t?.chooseStyle || 'Visual Style & Timeline'}
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {(Object.keys(STYLE_ASSETS) as WishStyle[]).map((styleKey) => {
@@ -642,7 +645,7 @@ export const AIWishVisionModal: React.FC<AIWishVisionModalProps> = ({
             >
               <Sparkles className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
               <span>
-                {isGenerating ? generationStep : 'Manifest Wish into Photo & Video (+50 pts)'}
+                {isGenerating ? (t?.generating || generationStep) : (t?.generateVision ? `${t.generateVision} (+50 pts)` : 'Manifest Wish into Photo & Video (+50 pts)')}
               </span>
             </button>
 

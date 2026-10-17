@@ -14,19 +14,22 @@ import {
   Layers
 } from 'lucide-react';
 import { PastSelfCapsule } from '../types';
+import { Translations } from '../i18n/translations';
 
 interface CapsuleCardProps {
   capsule: PastSelfCapsule;
   onRecordDuet: (capsule: PastSelfCapsule) => void;
   onViewDuets: (capsule: PastSelfCapsule) => void;
   onShare?: (capsule: PastSelfCapsule) => void;
+  t?: Translations;
 }
 
 export const CapsuleCard: React.FC<CapsuleCardProps> = ({
   capsule,
   onRecordDuet,
   onViewDuets,
-  onShare
+  onShare,
+  t
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -81,10 +84,10 @@ export const CapsuleCard: React.FC<CapsuleCardProps> = ({
               <Lock className="w-6 h-6" />
             </div>
             <span className="relative z-10 text-xs font-bold text-neutral-300">
-              Locked Time-Capsule
+              {t?.lockedTimeCapsule || 'Locked Time-Capsule'}
             </span>
             <span className="relative z-10 text-[11px] font-mono-code text-amber-400 font-semibold mt-1">
-              Unlocks in {capsule.daysRemaining} days ({capsule.unlockDate})
+              {(t?.unlocksIn || 'Unlocks in')} {capsule.daysRemaining} {t?.days || 'days'} ({capsule.unlockDate})
             </span>
           </div>
         )}
@@ -94,12 +97,12 @@ export const CapsuleCard: React.FC<CapsuleCardProps> = ({
           {capsule.isUnlocked ? (
             <span className="bg-rose-500/90 text-white font-mono-code font-bold text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg shadow-rose-500/30">
               <Unlock className="w-3 h-3" />
-              <span>UNLOCKED ({capsule.yearsAgo}Y AGO)</span>
+              <span>{t?.unlockedAgo || 'UNLOCKED'} ({capsule.yearsAgo} {t?.yearsAgo || 'Y AGO'})</span>
             </span>
           ) : (
             <span className="bg-neutral-950/80 text-amber-400 border border-amber-400/30 font-mono-code font-bold text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1">
               <Lock className="w-3 h-3" />
-              <span>VAULTED</span>
+              <span>{t?.vaultedCapsule || 'VAULTED'}</span>
             </span>
           )}
         </div>
@@ -133,7 +136,7 @@ export const CapsuleCard: React.FC<CapsuleCardProps> = ({
 
             <div className="text-right">
               <span className="text-[10px] font-mono-code text-neutral-400 block">
-                Recorded
+                {t?.recordedOn || 'Recorded'}
               </span>
               <span className="text-[11px] font-bold text-neutral-300">
                 {capsule.recordedDate}
@@ -155,10 +158,10 @@ export const CapsuleCard: React.FC<CapsuleCardProps> = ({
               <div className="flex items-center justify-between text-[10px] font-mono-code mb-1">
                 <span className="text-amber-400 font-bold flex items-center gap-1">
                   <HelpCircle className="w-3 h-3" />
-                  PREDICTION BET
+                  {t?.predictionBetLabel || 'PREDICTION BET'}
                 </span>
                 <span className="text-neutral-400">
-                  {capsule.prediction.confidence}% Confident
+                  {capsule.prediction.confidence}% {t?.confidence || 'Confident'}
                 </span>
               </div>
               <p className="text-xs text-neutral-200 font-medium">
@@ -167,11 +170,11 @@ export const CapsuleCard: React.FC<CapsuleCardProps> = ({
               {capsule.prediction.outcome && (
                 <div className="mt-1.5 flex items-center gap-1 text-[10px] font-bold">
                   {capsule.prediction.outcome === 'correct' ? (
-                    <span className="text-emerald-400">✅ Prediction Came True!</span>
+                    <span className="text-emerald-400">{t?.predictionTrue || '✅ Prediction Came True!'}</span>
                   ) : capsule.prediction.outcome === 'wrong' ? (
-                    <span className="text-rose-400">❌ Failed Prediction</span>
+                    <span className="text-rose-400">{t?.predictionWrong || '❌ Failed Prediction'}</span>
                   ) : (
-                    <span className="text-amber-400">⏳ Still Pending</span>
+                    <span className="text-amber-400">{t?.predictionPending || '⏳ Still Pending'}</span>
                   )}
                 </div>
               )}
@@ -180,12 +183,12 @@ export const CapsuleCard: React.FC<CapsuleCardProps> = ({
 
           {/* Tags */}
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {capsule.tags.map((t) => (
+            {capsule.tags.map((tag) => (
               <span 
-                key={t}
+                key={tag}
                 className="text-[10px] font-mono-code px-2 py-0.5 rounded-md bg-neutral-800 text-neutral-400"
               >
-                #{t}
+                #{tag}
               </span>
             ))}
           </div>
@@ -201,14 +204,14 @@ export const CapsuleCard: React.FC<CapsuleCardProps> = ({
                 className="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-bold text-xs shadow-lg shadow-rose-500/20 hover:shadow-rose-500/40 transition-all active:scale-95"
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Duet / React</span>
+                <span>{t?.duetReactBtn || 'Duet / React'}</span>
               </button>
 
               {/* View Duets */}
               <button
                 onClick={() => onViewDuets(capsule)}
                 className="flex items-center gap-1.5 py-2 px-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white text-xs font-semibold transition-colors"
-                title="View reactions & duets"
+                title={t?.viewDuetsTooltip || 'View reactions & duets'}
               >
                 <Layers className="w-3.5 h-3.5 text-purple-400" />
                 <span>{capsule.duetCount}</span>
@@ -219,7 +222,7 @@ export const CapsuleCard: React.FC<CapsuleCardProps> = ({
                 <button
                   onClick={() => onShare(capsule)}
                   className="flex items-center gap-1.5 py-2 px-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white text-xs font-semibold transition-colors group/share"
-                  title="Share to TikTok or Instagram (+75 pts)"
+                  title={t?.shareEarnPoints || 'Share (+75 pts)'}
                 >
                   <Share2 className="w-3.5 h-3.5 text-cyan-400 group-hover/share:scale-110 transition-transform" />
                   <span className="text-[10px] font-mono-code font-bold text-amber-400">+75pts</span>
@@ -229,13 +232,13 @@ export const CapsuleCard: React.FC<CapsuleCardProps> = ({
           ) : (
             <div className="w-full flex items-center gap-2">
               <div className="flex-1 text-center py-2 px-3 rounded-xl bg-neutral-950 text-neutral-400 text-xs font-mono-code border border-neutral-800 truncate">
-                Unlocks on {capsule.unlockDate}
+                {(t?.unlocksOn || 'Unlocks on')} {capsule.unlockDate}
               </div>
               {onShare && (
                 <button
                   onClick={() => onShare(capsule)}
                   className="flex items-center gap-1.5 py-2 px-3 rounded-xl bg-gradient-to-r from-purple-500/20 to-rose-500/20 hover:from-purple-500/30 hover:to-rose-500/30 border border-purple-500/30 text-neutral-200 text-xs font-semibold transition-all shrink-0 active:scale-95"
-                  title="Share prediction to earn points"
+                  title={t?.shareEarnPoints || 'Share (+75 pts)'}
                 >
                   <Share2 className="w-3.5 h-3.5 text-cyan-400" />
                   <span className="text-[10px] font-mono-code font-bold text-amber-400">+75pts</span>

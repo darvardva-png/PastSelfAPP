@@ -14,17 +14,20 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sfx } from '../utils/audioFX';
+import { Translations } from '../i18n/translations';
 
 interface ProUpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
   userEmail: string;
+  t?: Translations;
 }
 
 export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
   isOpen,
   onClose,
-  userEmail
+  userEmail,
+  t
 }) => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -89,10 +92,10 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
           </div>
 
           <h3 className="text-2xl font-display font-black text-white tracking-tight">
-            PastSelf <span className="text-rose-400">Chrono Pass Pro</span>
+            {t?.proModalTitle || 'PastSelf Chrono Pass Pro'}
           </h3>
           <p className="text-xs text-neutral-300 mt-1 max-w-md mx-auto">
-            Unlock 10-year ultra-vault locks, 4K 60fps duet export, and remove watermarks.
+            {t?.proModalSub || 'Unlock 10-year ultra-vault locks, 4K 60fps duet export, and remove watermarks.'}
           </p>
 
           {/* Billing Switcher */}
@@ -103,7 +106,7 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
                 billingCycle === 'monthly' ? 'bg-neutral-800 text-white shadow' : 'text-neutral-400 hover:text-white'
               }`}
             >
-              $4.99 / month
+              $4.99 / {t?.monthly || 'month'}
             </button>
             <button
               onClick={() => setBillingCycle('yearly')}
@@ -111,9 +114,9 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
                 billingCycle === 'yearly' ? 'bg-rose-500 text-white shadow' : 'text-neutral-400 hover:text-white'
               }`}
             >
-              <span>$39.99 / year</span>
+              <span>$39.99 / {t?.yearly || 'year'}</span>
               <span className="text-[10px] bg-black/40 px-1.5 py-0.2 rounded-full font-bold text-amber-300">
-                Save 35%
+                {t?.save33 || 'Save 35%'}
               </span>
             </button>
           </div>
@@ -161,8 +164,8 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
                 {isProcessing 
                   ? 'Connecting to Checkout...' 
                   : stripeLinkInput.trim()
-                    ? `Proceed to Checkout via Stripe (${billingCycle === 'yearly' ? '$39.99/yr' : '$4.99/mo'})`
-                    : `Upgrade Now (${billingCycle === 'yearly' ? '$39.99/yr' : '$4.99/mo'})`}
+                    ? `${t?.upgradeNow || 'Proceed to Checkout via Stripe'} (${billingCycle === 'yearly' ? '$39.99/yr' : '$4.99/mo'})`
+                    : `${t?.upgradeNow || 'Upgrade Now'} (${billingCycle === 'yearly' ? '$39.99/yr' : '$4.99/mo'})`}
               </span>
             </button>
             <p className="text-[10px] text-center text-neutral-500 mt-2 font-mono-code">
@@ -177,10 +180,10 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
               className="text-[11px] font-mono-code text-neutral-400 hover:text-rose-400 underline flex items-center justify-center gap-1.5 mx-auto"
             >
               <span>⚙️</span>
-              <span>{showConfig ? 'Hide Stripe Payment Link Settings' : 'Connect Your Live Stripe Payment Link'}</span>
+              <span>{showConfig ? 'Hide Stripe Settings' : (t?.configureStripe || 'Connect Your Live Stripe Payment Link')}</span>
               {stripeLinkInput.trim() && (
                 <span className="bg-emerald-500/20 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded-full border border-emerald-500/30">
-                  Connected
+                  {t?.stripeConnected ? '✓ Connected' : 'Connected'}
                 </span>
               )}
             </button>

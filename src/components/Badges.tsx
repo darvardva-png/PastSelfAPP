@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sfx } from '../utils/audioFX';
+import { Translations } from '../i18n/translations';
 
 export interface BadgeDefinition {
   id: string;
@@ -38,6 +39,7 @@ interface BadgesProps {
   timeBombsJoinedCount: number;
   sharesCount: number;
   onBadgeClick?: (badge: BadgeDefinition) => void;
+  t?: Translations;
 }
 
 export const Badges: React.FC<BadgesProps> = ({
@@ -47,7 +49,8 @@ export const Badges: React.FC<BadgesProps> = ({
   predictionBetsCount,
   timeBombsJoinedCount,
   sharesCount,
-  onBadgeClick
+  onBadgeClick,
+  t
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'unlocked' | 'in_progress'>('all');
   const [activeModalBadge, setActiveModalBadge] = useState<BadgeDefinition | null>(null);
@@ -259,7 +262,7 @@ export const Badges: React.FC<BadgesProps> = ({
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
-            All Badges ({badgesList.length})
+            {t?.allBadges || 'All Badges'} ({badgesList.length})
           </button>
           <button
             onClick={() => setSelectedFilter('unlocked')}
@@ -269,7 +272,7 @@ export const Badges: React.FC<BadgesProps> = ({
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
-            Unlocked ({unlockedCount})
+            {t?.unlockedBadges || 'Unlocked'} ({unlockedCount})
           </button>
           <button
             onClick={() => setSelectedFilter('in_progress')}
@@ -279,7 +282,7 @@ export const Badges: React.FC<BadgesProps> = ({
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
-            In Progress ({totalBadges - unlockedCount})
+            {t?.inProgressBadges || 'In Progress'} ({totalBadges - unlockedCount})
           </button>
         </div>
 

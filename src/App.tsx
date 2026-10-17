@@ -43,7 +43,26 @@ import confetti from 'canvas-confetti';
 
 export default function App() {
   // App state & i18n
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguage] = useState<Language>(() => {
+    try {
+      const saved = localStorage.getItem('pastself_language');
+      if (saved === 'en' || saved === 'es' || saved === 'pt') return saved;
+      if (typeof navigator !== 'undefined') {
+        const browser = navigator.language?.slice(0, 2);
+        if (browser === 'es') return 'es';
+        if (browser === 'pt') return 'pt';
+      }
+    } catch {}
+    return 'en';
+  });
+
+  const handleLanguageChange = (newLang: Language) => {
+    setLanguage(newLang);
+    try {
+      localStorage.setItem('pastself_language', newLang);
+    } catch {}
+  };
+
   const t = TRANSLATIONS[language];
   const [vaultSortBy, setVaultSortBy] = useState<'unlockDate' | 'creationDate' | 'title'>('unlockDate');
 
@@ -289,7 +308,7 @@ export default function App() {
         onSignOut={logOut}
         unlockedCount={unlockedCount}
         currentLanguage={language}
-        onLanguageChange={setLanguage}
+        onLanguageChange={handleLanguageChange}
         t={t}
       />
 
@@ -358,7 +377,7 @@ export default function App() {
                       : 'text-neutral-400 hover:text-white'
                   }`}
                 >
-                  All Capsules ({capsules.length})
+                  {t.allCapsules} ({capsules.length})
                 </button>
 
                 <button
@@ -369,7 +388,7 @@ export default function App() {
                       : 'text-neutral-400 hover:text-white'
                   }`}
                 >
-                  Friends Only
+                  {t.friendsOnly}
                 </button>
 
                 <button
@@ -380,7 +399,7 @@ export default function App() {
                       : 'text-neutral-400 hover:text-white'
                   }`}
                 >
-                  Ready to Duet ⚡
+                  {t.readyToDuet}
                 </button>
               </div>
 
@@ -391,7 +410,7 @@ export default function App() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search memories, predictions..."
+                  placeholder={t.searchPlaceholder}
                   className="w-full bg-neutral-950 border border-neutral-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-rose-500/50"
                 />
               </div>
@@ -409,6 +428,7 @@ export default function App() {
                     setSelectedDuetForShowcase(match);
                   }}
                   onShare={handleOpenShareCapsule}
+                  t={t}
                 />
               ))}
             </div>
@@ -422,10 +442,10 @@ export default function App() {
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-purple-400" />
-                  Trending Split-Screen Duets
+                  {t.trendingDuetsTitle}
                 </h3>
                 <p className="text-xs text-neutral-400">
-                  Past Self vs Present Reactions with synced dual playback & #PastSelfApp watermark
+                  {t.trendingDuetsSub}
                 </p>
               </div>
 
@@ -434,7 +454,7 @@ export default function App() {
                 className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 text-white font-bold text-xs shadow-md transition-all active:scale-95"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Record New Reaction</span>
+                <span>{t.recordNewReaction}</span>
               </button>
             </div>
 
@@ -462,7 +482,7 @@ export default function App() {
                       </div>
 
                       <span className="text-[10px] font-mono-code bg-purple-500/10 text-purple-300 border border-purple-500/20 px-2 py-0.5 rounded-full">
-                        {duet.layout === 'stacked-vertical' ? '9:16 Vertical Duet' : 'Side-by-Side Split'}
+                        {duet.layout === 'stacked-vertical' ? t.verticalDuet : t.splitDuet}
                       </span>
                     </div>
 
@@ -478,13 +498,13 @@ export default function App() {
                       <div className="w-1/2 h-full relative border-r border-rose-500/40">
                         <video src={duet.pastVideoUrl} muted playsInline loop className="w-full h-full object-cover" />
                         <span className="absolute bottom-1.5 left-1.5 bg-black/80 px-1.5 py-0.2 rounded text-[8px] font-mono-code text-rose-300">
-                          Past
+                          {t.pastSelfLabel}
                         </span>
                       </div>
                       <div className="w-1/2 h-full relative">
                         <video src={duet.reactionVideoUrl} muted playsInline loop className="w-full h-full object-cover" />
                         <span className="absolute bottom-1.5 left-1.5 bg-black/80 px-1.5 py-0.2 rounded text-[8px] font-mono-code text-cyan-300">
-                          Reaction
+                          {t.presentReactionLabel}
                         </span>
                       </div>
 
@@ -510,7 +530,7 @@ export default function App() {
 
                     <span className="text-[11px] font-bold text-rose-400 flex items-center gap-1">
                       <Play className="w-3 h-3 fill-rose-400" />
-                      Watch Synchronized
+                      {t.watchSynchronized}
                     </span>
                   </div>
                 </div>
@@ -526,10 +546,10 @@ export default function App() {
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <Users className="w-5 h-5 text-amber-400" />
-                  &ldquo;Time Bomb&rdquo; Group Challenges
+                  {t.timeBombsTitle}
                 </h3>
                 <p className="text-xs text-neutral-400">
-                  You and your crew record answers to a future prompt locked until a fixed date, then unbox together!
+                  {t.timeBombsSub}
                 </p>
               </div>
 
@@ -538,7 +558,7 @@ export default function App() {
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs shadow-lg shadow-amber-500/20 active:scale-95 transition-all shrink-0"
               >
                 <Users className="w-3.5 h-3.5" />
-                <span>Create Group Capsule</span>
+                <span>{t.createGroupCapsule}</span>
               </button>
             </div>
 
@@ -552,10 +572,10 @@ export default function App() {
                   <div>
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-[10px] font-mono-code font-bold uppercase px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">
-                        {bomb.isUnlocked ? '🔓 UNBOXED TODAY' : `⏳ LOCKED (${bomb.daysRemaining} DAYS)`}
+                        {bomb.isUnlocked ? `🔓 ${t.unboxedToday}` : `⏳ ${t.lockedDays} (${bomb.daysRemaining} ${t.days})`}
                       </span>
                       <span className="text-[11px] font-mono-code text-neutral-400">
-                        Unlock: {bomb.unlockDate}
+                        {t.unlocksOn}: {bomb.unlockDate}
                       </span>
                     </div>
 
@@ -564,7 +584,7 @@ export default function App() {
 
                     {/* Participants Avatars */}
                     <div className="bg-neutral-950 p-3 rounded-2xl border border-neutral-800 mb-4 flex items-center justify-between">
-                      <span className="text-[11px] font-mono-code text-neutral-400">Crew Vaulted</span>
+                      <span className="text-[11px] font-mono-code text-neutral-400">{t.crewVaulted}</span>
                       <div className="flex -space-x-2">
                         {bomb.participants.map((p, i) => (
                           <img
@@ -582,7 +602,7 @@ export default function App() {
                   <button
                     className="w-full py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs border border-neutral-700 transition-colors flex items-center justify-center gap-2"
                   >
-                    <span>{bomb.isUnlocked ? 'Enter Unboxing Room' : 'View Group Predictions'}</span>
+                    <span>{bomb.isUnlocked ? t.enterUnboxingRoom : t.viewGroupPredictions}</span>
                   </button>
                 </div>
               ))}
@@ -749,6 +769,7 @@ export default function App() {
                 predictionBetsCount={predictionBetsCount}
                 timeBombsJoinedCount={timeBombsJoinedCount}
                 sharesCount={sharesCount}
+                t={t}
               />
             </div>
 
@@ -761,13 +782,13 @@ export default function App() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-base font-bold text-white">Chrono Points & Monetization Hub</h3>
+                      <h3 className="text-base font-bold text-white">{t.pointsHubTitle}</h3>
                       <span className="text-[10px] font-mono-code font-bold uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                        {userPoints} Points
+                        {userPoints} {t.chronoPoints}
                       </span>
                     </div>
                     <p className="text-xs text-neutral-400">
-                      Earn free points by sharing AI wishes on social media, or upgrade to Pro Pass for unlimited 4K locks.
+                      {t.pointsHubDesc}
                     </p>
                   </div>
                 </div>
@@ -778,7 +799,7 @@ export default function App() {
                     className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white font-bold text-xs shadow-md transition-all active:scale-95"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>Manifest Wish (+50 pts)</span>
+                    <span>{t.manifestWishBtn}</span>
                   </button>
 
                   <button
@@ -786,7 +807,7 @@ export default function App() {
                     className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-amber-300 font-bold text-xs border border-amber-500/30 transition-all active:scale-95"
                   >
                     <Crown className="w-3.5 h-3.5 text-amber-400" />
-                    <span>View Pro Pass</span>
+                    <span>{t.viewProPassBtn}</span>
                   </button>
                 </div>
               </div>
@@ -796,29 +817,29 @@ export default function App() {
                 {/* Free Tier */}
                 <div className="bg-neutral-950/70 border border-neutral-800/80 rounded-2xl p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-emerald-400 font-mono-code uppercase">Free Core Features</span>
-                    <span className="text-[10px] font-mono-code px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Included for Everyone</span>
+                    <span className="text-xs font-bold text-emerald-400 font-mono-code uppercase">{t.freeCoreFeatures}</span>
+                    <span className="text-[10px] font-mono-code px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">{t.includedForEveryone}</span>
                   </div>
                   <ul className="text-xs text-neutral-300 space-y-1.5">
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-400 text-xs">✓</span>
-                      <span>Lock video capsules (6 months, 1 year, 3 years)</span>
+                      <span>{t.freeFeature1}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-400 text-xs">✓</span>
-                      <span>Record side-by-side blind reactions & duets</span>
+                      <span>{t.freeFeature2}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-400 text-xs">✓</span>
-                      <span>AI Future Wish short video generator (+50 pts)</span>
+                      <span>{t.freeFeature3}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-400 text-xs">✓</span>
-                      <span>Earn 100 points per share to TikTok/Instagram</span>
+                      <span>{t.freeFeature4}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-400 text-xs">✓</span>
-                      <span>Standard HD export with #PastSelfApp watermark</span>
+                      <span>{t.freeFeature5}</span>
                     </li>
                   </ul>
                 </div>
@@ -826,29 +847,29 @@ export default function App() {
                 {/* Paid Pro / Monetization Tier */}
                 <div className="bg-neutral-950/70 border border-amber-500/30 rounded-2xl p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-amber-400 font-mono-code uppercase">Paid Pro & Add-ons</span>
-                    <span className="text-[10px] font-mono-code px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">$4.99/mo or $39.99/yr</span>
+                    <span className="text-xs font-bold text-amber-400 font-mono-code uppercase">{t.paidProAddons}</span>
+                    <span className="text-[10px] font-mono-code px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">{t.proPriceLabel}</span>
                   </div>
                   <ul className="text-xs text-neutral-300 space-y-1.5">
                     <li className="flex items-center gap-2">
                       <span className="text-amber-400 text-xs">★</span>
-                      <span>10-year & 20-year ultra-vault storage</span>
+                      <span>{t.proFeature1}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-amber-400 text-xs">★</span>
-                      <span>4K 60fps canvas compositing & clean export</span>
+                      <span>{t.proFeature2}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-amber-400 text-xs">★</span>
-                      <span>Remove or customize the watermark with your brand</span>
+                      <span>{t.proFeature3}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-amber-400 text-xs">★</span>
-                      <span>All premium retro filters (VHS, Y2K Digicam, Cyberpunk)</span>
+                      <span>{t.proFeature4}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-amber-400 text-xs">★</span>
-                      <span>Direct Stripe payment integration for creator revenue</span>
+                      <span>{t.proFeature5}</span>
                     </li>
                   </ul>
                 </div>
@@ -925,6 +946,7 @@ export default function App() {
                           setSelectedDuetForShowcase(match);
                         }}
                         onShare={handleOpenShareCapsule}
+                        t={t}
                       />
                     ))}
                   </div>
@@ -1052,6 +1074,7 @@ export default function App() {
         isOpen={isProModalOpen}
         onClose={() => setIsProModalOpen(false)}
         userEmail={currentUser?.email || 'darvar.DVA@gmail.com'}
+        t={t}
       />
 
       {/* MODAL 9: AI WISH VISION & SHORT VIDEO MANIFESTOR */}
@@ -1061,6 +1084,7 @@ export default function App() {
         userPoints={userPoints}
         onAddPoints={handleAddPoints}
         userEmail={currentUser?.email || 'darvar.DVA@gmail.com'}
+        t={t}
       />
 
       {/* MODAL 10: CAPSULE UNIQUE LINK & SOCIAL SHARE (TIKTOK / INSTAGRAM / POINTS) */}
@@ -1071,6 +1095,7 @@ export default function App() {
           capsule={selectedCapsuleForShare}
           userPoints={userPoints}
           onAddPoints={handleAddPoints}
+          t={t}
         />
       )}
 

@@ -21,6 +21,7 @@ import {
 import confetti from 'canvas-confetti';
 import { PastSelfCapsule } from '../types';
 import { sfx } from '../utils/audioFX';
+import { Translations } from '../i18n/translations';
 
 interface CapsuleShareModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ interface CapsuleShareModalProps {
   capsule: PastSelfCapsule;
   userPoints: number;
   onAddPoints: (points: number, reason: string) => void;
+  t?: Translations;
 }
 
 export const CapsuleShareModal: React.FC<CapsuleShareModalProps> = ({
@@ -35,7 +37,8 @@ export const CapsuleShareModal: React.FC<CapsuleShareModalProps> = ({
   onClose,
   capsule,
   userPoints,
-  onAddPoints
+  onAddPoints,
+  t
 }) => {
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedCaption, setCopiedCaption] = useState(false);
@@ -413,17 +416,17 @@ export const CapsuleShareModal: React.FC<CapsuleShareModalProps> = ({
           </div>
 
           <h3 className="text-xl font-display font-black text-white tracking-tight">
-            Share Capsule & <span className="text-amber-400">Earn Chrono Points</span>
+            {t?.shareModalTitle || 'Share Capsule & Earn Chrono Points'}
           </h3>
           <p className="text-xs text-neutral-300 mt-1 max-w-md mx-auto">
-            Share your time-capsule or predictions to TikTok, Instagram & friends to unlock viral perks!
+            {t?.shareModalSub || 'Share your time-capsule or predictions to TikTok, Instagram & friends to unlock viral perks!'}
           </p>
 
           {/* User Points Badge */}
           <div className="mt-3 inline-flex items-center gap-2 bg-neutral-950/90 border border-neutral-800 px-3.5 py-1.5 rounded-full shadow-inner">
             <Coins className="w-4 h-4 text-amber-400" />
             <span className="text-xs font-mono-code font-bold text-neutral-200">
-              Your Chrono Balance: <span className="text-amber-400 font-extrabold">{userPoints} pts</span>
+              {t?.chronoPoints || 'Chrono Points'}: <span className="text-amber-400 font-extrabold">{userPoints} pts</span>
             </span>
             {earnedToday > 0 && (
               <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold border border-emerald-500/30">
@@ -445,11 +448,11 @@ export const CapsuleShareModal: React.FC<CapsuleShareModalProps> = ({
               <div className="flex items-center gap-1.5 mb-1">
                 {capsule.isUnlocked ? (
                   <span className="text-[10px] font-mono-code font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md flex items-center gap-1 border border-emerald-500/30">
-                    <Unlock className="w-3 h-3" /> Unlocked ({capsule.yearsAgo}y ago)
+                    <Unlock className="w-3 h-3" /> {t?.unlockedAgo || 'UNLOCKED'} ({capsule.yearsAgo} {t?.yearsAgo || 'Y AGO'})
                   </span>
                 ) : (
                   <span className="text-[10px] font-mono-code font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md flex items-center gap-1 border border-amber-500/30">
-                    <Lock className="w-3 h-3" /> Vaulted (Unlocks {capsule.unlockDate})
+                    <Lock className="w-3 h-3" /> {t?.vaultedCapsule || 'VAULTED'} ({(t?.unlocksOn || 'Unlocks on')} {capsule.unlockDate})
                   </span>
                 )}
                 <span className="text-[10px] font-mono-code text-neutral-500">#{capsule.id}</span>
@@ -461,7 +464,7 @@ export const CapsuleShareModal: React.FC<CapsuleShareModalProps> = ({
               {capsule.prediction && (
                 <div className="mt-1.5 flex items-center gap-1 text-[10px] text-amber-300">
                   <HelpCircle className="w-3 h-3 text-amber-400 shrink-0" />
-                  <span className="truncate">Bet: {capsule.prediction.prediction}</span>
+                  <span className="truncate">{t?.predictionBetLabel || 'PREDICTION BET'}: {capsule.prediction.prediction}</span>
                 </div>
               )}
             </div>
@@ -471,7 +474,7 @@ export const CapsuleShareModal: React.FC<CapsuleShareModalProps> = ({
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <label className="text-[11px] font-mono-code uppercase font-bold text-neutral-300 flex items-center gap-1.5">
-                <span>Unique Capsule Link</span>
+                <span>{t?.uniqueLink || 'Unique Capsule Link'}</span>
                 <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.2 rounded border border-amber-500/20">
                   +25 pts
                 </span>
@@ -497,7 +500,7 @@ export const CapsuleShareModal: React.FC<CapsuleShareModalProps> = ({
                 }`}
               >
                 {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedLink ? 'Copied!' : 'Copy'}</span>
+                <span>{copiedLink ? (t?.copied || 'Copied!') : (t?.copyLink || 'Copy Link')}</span>
               </button>
             </div>
           </div>
@@ -505,8 +508,8 @@ export const CapsuleShareModal: React.FC<CapsuleShareModalProps> = ({
           {/* 2. One-Tap Social Media API Triggers */}
           <div className="space-y-2 pt-1">
             <label className="text-[11px] font-mono-code uppercase font-bold text-neutral-300 flex items-center justify-between">
-              <span>Post Directly to Earn Points</span>
-              <span className="text-[10px] text-neutral-400 font-normal">Click platform to share & claim</span>
+              <span>{t?.sharePlatforms || 'Direct Social Media Sharing'}</span>
+              <span className="text-[10px] text-neutral-400 font-normal">+75 pts</span>
             </label>
 
             <div className="grid grid-cols-2 gap-2.5">
@@ -617,20 +620,20 @@ export const CapsuleShareModal: React.FC<CapsuleShareModalProps> = ({
             >
               <Download className="w-3.5 h-3.5 text-purple-400" />
               <span>
-                {isGeneratingStoryCard ? 'Rendering Story Poster...' : 'Download 9:16 Story Card (PNG for IG / TikTok)'}
+                {isGeneratingStoryCard ? 'Rendering Story Poster...' : (t?.downloadCard || 'Download Story Card (PNG)')}
               </span>
             </button>
           </div>
 
           {/* Viral Caption Copy Tool */}
           <div className="pt-2 border-t border-neutral-800 flex items-center justify-between text-xs">
-            <span className="text-neutral-400 text-[11px]">Ready-to-paste caption:</span>
+            <span className="text-neutral-400 text-[11px]">{t?.copyLink ? `${t.copyLink} & Caption` : 'Ready-to-paste caption:'}</span>
             <button
               onClick={handleCopyCaption}
               className="text-[11px] text-rose-400 hover:text-rose-300 font-mono-code flex items-center gap-1 underline"
             >
               {copiedCaption ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-              <span>{copiedCaption ? 'Copied Caption!' : 'Copy Pre-Made Caption'}</span>
+              <span>{copiedCaption ? (t?.copied || 'Copied!') : (t?.copyLink || 'Copy Caption')}</span>
             </button>
           </div>
 
