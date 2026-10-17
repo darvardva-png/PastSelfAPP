@@ -1,0 +1,6 @@
+{
+  "name": "PastSelf - Time-Capsule Video Social Network",
+  "description": "Record short video time-capsules for your future self, unlock blind reaction split-screen duets, and launch viral time-bomb group challenges.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

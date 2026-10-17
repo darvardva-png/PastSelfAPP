@@ -1,0 +1,57 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile for PastSelf",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Capsule": {
+      "title": "Capsule",
+      "description": "Time-capsule video memory",
+      "type": "object",
+      "properties": {
+        "creatorUid": { "type": "string" },
+        "creatorName": { "type": "string" },
+        "title": { "type": "string" },
+        "prompt": { "type": "string" },
+        "unlockDate": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["creatorUid", "title"]
+    },
+    "Duet": {
+      "title": "Duet",
+      "description": "Split-screen reaction duet to a capsule",
+      "type": "object",
+      "properties": {
+        "reactorUid": { "type": "string" },
+        "capsuleId": { "type": "string" },
+        "caption": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["reactorUid", "capsuleId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/capsules/{capsuleId}": {
+      "schema": "Capsule",
+      "description": "Time-locked video capsules"
+    },
+    "/duets/{duetId}": {
+      "schema": "Duet",
+      "description": "Split-screen reaction duets"
+    }
+  }
+}
