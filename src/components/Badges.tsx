@@ -119,6 +119,17 @@ export const Badges: React.FC<BadgesProps> = ({
       iconName: 'share',
       tier: 'bronze',
       perk: 'Ultra HD 60fps canvas export option'
+    },
+    {
+      id: 'social-ambassador',
+      name: 'Social Ambassador',
+      description: 'Share 3 capsules or duets directly to TikTok, Instagram, or friends',
+      category: 'special',
+      targetCount: 3,
+      currentCount: sharesCount,
+      iconName: 'share',
+      tier: 'gold',
+      perk: 'Neon creator verified badge on all shared video time-capsules'
     }
   ];
 

@@ -34,6 +34,7 @@ import { NewGroupCapsuleModal } from './components/NewGroupCapsuleModal';
 import { CapsuleRecapModal } from './components/CapsuleRecapModal';
 import { ProUpgradeModal } from './components/ProUpgradeModal';
 import { AIWishVisionModal } from './components/AIWishVisionModal';
+import { CapsuleShareModal } from './components/CapsuleShareModal';
 import { Badges } from './components/Badges';
 import { auth, signInWithGoogle, logOut, onAuthStateChanged, User } from './firebase';
 import { Language, TRANSLATIONS } from './i18n/translations';
@@ -62,8 +63,14 @@ export default function App() {
   const [blindReactionsCount, setBlindReactionsCount] = useState<number>(2);
   const [predictionBetsCount, setPredictionBetsCount] = useState<number>(2);
   const [timeBombsJoinedCount, setTimeBombsJoinedCount] = useState<number>(1);
-  const [sharesCount, setSharesCount] = useState<number>(1);
-  const [userPoints, setUserPoints] = useState<number>(150);
+  const [sharesCount, setSharesCount] = useState<number>(() => {
+    const saved = localStorage.getItem('pastself_shares_count');
+    return saved ? parseInt(saved, 10) : 1;
+  });
+  const [userPoints, setUserPoints] = useState<number>(() => {
+    const saved = localStorage.getItem('pastself_user_points');
+    return saved ? parseInt(saved, 10) : 150;
+  });
   const [pointsHistory, setPointsHistory] = useState<Array<{ id: string; points: number; reason: string; date: string }>>([
     { id: 'p1', points: 100, reason: 'Welcome to Chrono Network', date: 'Oct 2026' },
     { id: 'p2', points: 50, reason: 'Completed Profile Setup', date: 'Today' }
@@ -72,6 +79,7 @@ export default function App() {
   // Modals state
   const [isRecorderOpen, setIsRecorderOpen] = useState(false);
   const [selectedCapsuleForDuet, setSelectedCapsuleForDuet] = useState<PastSelfCapsule | null>(null);
+  const [selectedCapsuleForShare, setSelectedCapsuleForShare] = useState<PastSelfCapsule | null>(null);
 
   const [isShareStudioOpen, setIsShareStudioOpen] = useState(false);
   const [activeShareData, setActiveShareData] = useState<{
@@ -95,6 +103,7 @@ export default function App() {
   const handleAddPoints = (points: number, reason: string) => {
     setUserPoints(prev => {
       const next = prev + points;
+      localStorage.setItem('pastself_user_points', String(next));
       return next;
     });
     setPointsHistory(prev => [
@@ -102,8 +111,35 @@ export default function App() {
       ...prev
     ]);
     if (reason.toLowerCase().includes('share')) {
-      setSharesCount(prev => prev + 1);
+      setSharesCount(prev => {
+        const next = prev + 1;
+        localStorage.setItem('pastself_shares_count', String(next));
+        return next;
+      });
     }
+  };
+
+  // Deep-link detector for shared capsules (e.g. ?capsule=capsule-1)
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sharedCapsuleId = urlParams.get('capsule');
+      if (sharedCapsuleId) {
+        const found = capsules.find(c => c.id === sharedCapsuleId);
+        if (found) {
+          setSelectedCapsuleForShare(found);
+          sfx.unlockChime();
+        }
+      }
+    } catch (e) {
+      console.warn('URL parsing error', e);
+    }
+  }, [capsules]);
+
+  // Trigger share modal for a capsule
+  const handleOpenShareCapsule = (capsule: PastSelfCapsule) => {
+    sfx.shutterClick();
+    setSelectedCapsuleForShare(capsule);
   };
 
   // Listen to Firebase Auth state
@@ -372,6 +408,7 @@ export default function App() {
                     const match = duets.find(d => d.capsuleId === c.id) || duets[0];
                     setSelectedDuetForShowcase(match);
                   }}
+                  onShare={handleOpenShareCapsule}
                 />
               ))}
             </div>
@@ -887,6 +924,7 @@ export default function App() {
                           const match = duets.find(d => d.capsuleId === c.id) || duets[0];
                           setSelectedDuetForShowcase(match);
                         }}
+                        onShare={handleOpenShareCapsule}
                       />
                     ))}
                   </div>
@@ -1024,6 +1062,17 @@ export default function App() {
         onAddPoints={handleAddPoints}
         userEmail={currentUser?.email || 'darvar.DVA@gmail.com'}
       />
+
+      {/* MODAL 10: CAPSULE UNIQUE LINK & SOCIAL SHARE (TIKTOK / INSTAGRAM / POINTS) */}
+      {selectedCapsuleForShare && (
+        <CapsuleShareModal
+          isOpen={!!selectedCapsuleForShare}
+          onClose={() => setSelectedCapsuleForShare(null)}
+          capsule={selectedCapsuleForShare}
+          userPoints={userPoints}
+          onAddPoints={handleAddPoints}
+        />
+      )}
 
     </div>
   );

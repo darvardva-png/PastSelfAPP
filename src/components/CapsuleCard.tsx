@@ -19,12 +19,14 @@ interface CapsuleCardProps {
   capsule: PastSelfCapsule;
   onRecordDuet: (capsule: PastSelfCapsule) => void;
   onViewDuets: (capsule: PastSelfCapsule) => void;
+  onShare?: (capsule: PastSelfCapsule) => void;
 }
 
 export const CapsuleCard: React.FC<CapsuleCardProps> = ({
   capsule,
   onRecordDuet,
-  onViewDuets
+  onViewDuets,
+  onShare
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -211,10 +213,34 @@ export const CapsuleCard: React.FC<CapsuleCardProps> = ({
                 <Layers className="w-3.5 h-3.5 text-purple-400" />
                 <span>{capsule.duetCount}</span>
               </button>
+
+              {/* Share Capsule & Earn Points */}
+              {onShare && (
+                <button
+                  onClick={() => onShare(capsule)}
+                  className="flex items-center gap-1.5 py-2 px-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white text-xs font-semibold transition-colors group/share"
+                  title="Share to TikTok or Instagram (+75 pts)"
+                >
+                  <Share2 className="w-3.5 h-3.5 text-cyan-400 group-hover/share:scale-110 transition-transform" />
+                  <span className="text-[10px] font-mono-code font-bold text-amber-400">+75pts</span>
+                </button>
+              )}
             </>
           ) : (
-            <div className="w-full text-center py-2 px-3 rounded-xl bg-neutral-950 text-neutral-500 text-xs font-mono-code border border-neutral-800">
-              Duets unlock on {capsule.unlockDate}
+            <div className="w-full flex items-center gap-2">
+              <div className="flex-1 text-center py-2 px-3 rounded-xl bg-neutral-950 text-neutral-400 text-xs font-mono-code border border-neutral-800 truncate">
+                Unlocks on {capsule.unlockDate}
+              </div>
+              {onShare && (
+                <button
+                  onClick={() => onShare(capsule)}
+                  className="flex items-center gap-1.5 py-2 px-3 rounded-xl bg-gradient-to-r from-purple-500/20 to-rose-500/20 hover:from-purple-500/30 hover:to-rose-500/30 border border-purple-500/30 text-neutral-200 text-xs font-semibold transition-all shrink-0 active:scale-95"
+                  title="Share prediction to earn points"
+                >
+                  <Share2 className="w-3.5 h-3.5 text-cyan-400" />
+                  <span className="text-[10px] font-mono-code font-bold text-amber-400">+75pts</span>
+                </button>
+              )}
             </div>
           )}
         </div>
